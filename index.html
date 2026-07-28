@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ahlaat.Pk</title>
+<style>
+  :root{
+    --ink:#1c1b19;
+    --paper:#fbfaf7;
+    --line:#e3e0d8;
+    --accent:#c65d2e;
+    --accent-dark:#9a4720;
+    --muted:#6b6860;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 32px;
+    border-bottom:1px solid var(--line);
+  }
+  header h1{
+    font-size:20px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    margin:0;
+  }
+  #cart-toggle{
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    padding:10px 16px;
+    border-radius:4px;
+    cursor:pointer;
+    font-size:14px;
+  }
+  main{
+    max-width:1000px;
+    margin:0 auto;
+    padding:32px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:24px;
+  }
+  .card{
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+    background:white;
+    display:flex;
+    flex-direction:column;
+  }
+  .card .swatch{
+    height:140px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:40px;
+  }
+  .card .info{
+    padding:14px 16px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    flex:1;
+  }
+  .card h3{ margin:0; font-size:16px; }
+  .card p.desc{ margin:0; font-size:13px; color:var(--muted); flex:1; }
+  .price{
+    font-family:'Courier New', monospace;
+    font-size:15px;
+    color:var(--accent-dark);
+  }
+  .add-btn{
+    margin-top:auto;
+    background:var(--accent);
+    color:white;
+    border:none;
+    padding:9px;
+    border-radius:4px;
+    cursor:pointer;
+    font-size:14px;
+  }
+  .add-btn:hover{ background:var(--accent-dark); }
+
+  #cart-drawer{
+    position:fixed;
+    top:0; right:-380px;
+    width:360px;
+    height:100%;
+    background:white;
+    border-left:1px solid var(--line);
+    padding:24px;
+    transition:right 0.25s ease;
+    overflow-y:auto;
+  }
+  #cart-drawer.open{ right:0; }
+  #cart-drawer h2{ margin-top:0; font-size:18px; }
+  .cart-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .cart-item button{
+    background:none;
+    border:none;
+    color:var(--accent-dark);
+    cursor:pointer;
+    font-size:13px;
+  }
+  #cart-total{
+    margin-top:16px;
+    font-weight:bold;
+    font-family:'Courier New', monospace;
+  }
+  form#checkout-form{
+    margin-top:20px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  form#checkout-form input, form#checkout-form textarea{
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    font-size:14px;
+    font-family:inherit;
+  }
+  #checkout-form button{
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    padding:11px;
+    border-radius:4px;
+    cursor:pointer;
+    font-size:14px;
+  }
+  #status-msg{ font-size:13px; margin-top:8px; }
+  #overlay{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(0,0,0,0.3);
+  }
+  #overlay.open{ display:block; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Ahlaat.Pk</h1>
+  <button id="cart-toggle">Cart (<span id="cart-count">0</span>)</button>
+</header>
+
+<main>
+  <div class="grid" id="product-grid"></div>
+</main>
+
+<div id="overlay"></div>
+<div id="cart-drawer">
+  <h2>Your Cart</h2>
+  <div id="cart-items"></div>
+  <div id="cart-total"></div>
+
+  <form id="checkout-form">
+    <input type="text" id="cust-name" placeholder="Full name" required />
+    <input type="email" id="cust-email" placeholder="Email address" required />
+    <input type="tel" id="cust-phone" placeholder="Phone (optional)" />
+    <textarea id="cust-address" placeholder="Shipping address" rows="3" required></textarea>
+    <button type="submit">Place order</button>
+  </form>
+  <div id="status-msg"></div>
+</div>
+
+<script>
+  // --- Edit this list to change what your store sells ---
+  const PRODUCTS = [
+    { id: 1, name: "Canvas Tote Bag",   price: 24.00, emoji: "👜", desc: "Heavyweight cotton canvas, everyday carry." },
+    { id: 2, name: "Ceramic Mug",       price: 18.00, emoji: "☕", desc: "Hand-glazed, holds 12oz." },
+    { id: 3, name: "Notebook Set",      price: 15.00, emoji: "📓", desc: "Three dot-grid notebooks, 120 pages each." },
+    { id: 4, name: "Wool Beanie",       price: 22.00, emoji: "🧢", desc: "Soft merino wool, one size fits most." },
+    { id: 5, name: "Enamel Pin Pack",   price: 12.00, emoji: "📌", desc: "Set of 5 assorted enamel pins." },
+    { id: 6, name: "Candle",           price: 20.00, emoji: "🕯️", desc: "Soy wax, cedar & sandalwood scent." },
+  ];
+
+  let cart = [];
+
+  const grid = document.getElementById('product-grid');
+  PRODUCTS.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="swatch">${p.emoji}</div>
+      <div class="info">
+        <h3>${p.name}</h3>
+        <p class="desc">${p.desc}</p>
+        <div class="price">$${p.price.toFixed(2)}</div>
+        <button class="add-btn" data-id="${p.id}">Add to cart</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  grid.addEventListener('click', (e) => {
+    if (e.target.classList.contains('add-btn')) {
+      const id = Number(e.target.dataset.id);
+      const product = PRODUCTS.find(p => p.id === id);
+      const existing = cart.find(i => i.id === id);
+      if (existing) existing.qty += 1;
+      else cart.push({ ...product, qty: 1 });
+      renderCart();
+    }
+  });
+
+  const cartDrawer = document.getElementById('cart-drawer');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('cart-toggle').addEventListener('click', () => {
+    cartDrawer.classList.add('open');
+    overlay.classList.add('open');
+  });
+  overlay.addEventListener('click', () => {
+    cartDrawer.classList.remove('open');
+    overlay.classList.remove('open');
+  });
+
+  function renderCart() {
+    const itemsEl = document.getElementById('cart-items');
+    const totalEl = document.getElementById('cart-total');
+    const countEl = document.getElementById('cart-count');
+
+    itemsEl.innerHTML = cart.map(i => `
+      <div class="cart-item">
+        <span>${i.name} × ${i.qty}</span>
+        <span>$${(i.price * i.qty).toFixed(2)} <button data-id="${i.id}">remove</button></span>
+      </div>
+    `).join('') || '<p style="color:#999;font-size:14px;">Your cart is empty.</p>';
+
+    const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+    totalEl.textContent = cart.length ? `Total: $${total.toFixed(2)}` : '';
+    countEl.textContent = cart.reduce((sum, i) => sum + i.qty, 0);
+  }
+
+  document.getElementById('cart-items').addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') {
+      const id = Number(e.target.dataset.id);
+      cart = cart.filter(i => i.id !== id);
+      renderCart();
+    }
+  });
+
+  document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById('status-msg');
+
+    if (cart.length === 0) {
+      statusEl.textContent = 'Add something to your cart first.';
+      statusEl.style.color = '#c65d2e';
+      return;
+    }
+
+    const customer = {
+      name: document.getElementById('cust-name').value,
+      email: document.getElementById('cust-email').value,
+      phone: document.getElementById('cust-phone').value,
+      address: document.getElementById('cust-address').value,
+    };
+    const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+
+    statusEl.textContent = 'Placing order...';
+    statusEl.style.color = '#6b6860';
+
+    try {
+      const res = await fetch('/api/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customer, items: cart, total }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        statusEl.textContent = 'Order placed! Check your email for confirmation.';
+        statusEl.style.color = '#2e7d32';
+        cart = [];
+        renderCart();
+        e.target.reset();
+      } else {
+        statusEl.textContent = data.error || 'Something went wrong.';
+        statusEl.style.color = '#c65d2e';
+      }
+    } catch (err) {
+      statusEl.textContent = 'Could not reach the server.';
+      statusEl.style.color = '#c65d2e';
+    }
+  });
+
+  renderCart();
+</script>
+</body>
+</html>
