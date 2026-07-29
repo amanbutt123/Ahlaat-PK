@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ahlaat.Pk — Shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B0B0D;
+    --charcoal:#17181C;
+    --slate:#232428;
+    --fog:#F2F1EE;
+    --silver:#A8A6A2;
+    --accent:#E1502E;
+    --gold:#D9A441;
+    --promo:#1E5C3F;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ background:var(--navy); color:var(--fog); font-family:'Manrope', sans-serif; }
+  a{ text-decoration:none; }
+
+  /* PROMO BAR */
+  .promo-bar{
+    background:var(--promo); color:var(--fog); font-size:0.8rem;
+    display:flex; align-items:center; justify-content:center; gap:0.6rem;
+    padding:0.55rem 1rem; letter-spacing:0.03em; flex-wrap:wrap; text-align:center;
+  }
+  .promo-bar .timer{
+    display:flex; gap:0.3rem; font-weight:700; color:var(--gold);
+  }
+  .promo-bar .timer span{
+    background:rgba(201,162,39,0.12); padding:0.15rem 0.4rem; border-radius:3px;
+  }
+
+  /* NAV */
+  header{
+    position:sticky; top:0; z-index:100;
+    background:var(--navy); border-bottom:1px solid rgba(154,163,178,0.15);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1rem 5%;
+  }
+  .logo{ font-weight:800; font-size:1.3rem; letter-spacing:0.02em; color:var(--fog); }
+  .logo span{ color:var(--gold); }
+  nav ul{ list-style:none; display:flex; gap:1.8rem; }
+  nav a{ color:var(--silver); font-size:0.88rem; font-weight:500; transition:color 0.2s ease; }
+  nav a:hover{ color:var(--fog); }
+  .nav-toggle{ display:none; background:none; border:none; color:var(--fog); font-size:1.5rem; cursor:pointer; }
+  .cart-icon{ color:var(--fog); font-size:1.2rem; position:relative; }
+
+  /* HERO / BANNER */
+  .banner{
+    display:grid; grid-template-columns:1.1fr 1fr; align-items:center;
+    background:linear-gradient(120deg, var(--charcoal), var(--navy));
+    margin:1.5rem 5%; border-radius:14px; overflow:hidden;
+    border:1px solid rgba(154,163,178,0.12);
+    min-height:380px;
+  }
+  .banner-text{ padding:3rem 3rem 3rem 3.5rem; }
+  .banner-text .eyebrow{
+    color:var(--gold); font-size:0.8rem; letter-spacing:0.15em; text-transform:uppercase; font-weight:700;
+  }
+  .banner-text h1{
+    font-size:clamp(2rem, 4.5vw, 3.4rem); margin:0.6rem 0 1rem; line-height:1.1; font-weight:800;
+  }
+  .banner-text p{ color:var(--silver); max-width:34ch; margin-bottom:1.6rem; }
+  .btn-primary{
+    display:inline-block; background:var(--gold); color:var(--navy); font-weight:700;
+    padding:0.85rem 2rem; border-radius:6px; font-size:0.9rem; transition:opacity 0.2s ease;
+  }
+  .btn-primary:hover{ opacity:0.88; }
+  .banner-visual{
+    height:100%; min-height:380px; background:radial-gradient(circle at 60% 40%, rgba(74,111,165,0.35), transparent 60%), var(--slate);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.4rem; color:rgba(237,239,243,0.15);
+    letter-spacing:0.1em;
+  }
+
+  /* PERK STRIP */
+  .perks{
+    display:flex; justify-content:center; gap:2.5rem; flex-wrap:wrap;
+    padding:1.6rem 5%; border-bottom:1px solid rgba(154,163,178,0.12);
+    font-size:0.82rem; color:var(--silver);
+  }
+  .perks div{ display:flex; align-items:center; gap:0.5rem; }
+  .perks strong{ color:var(--fog); }
+
+  /* SHOP GRID */
+  .shop-section{ padding:3.5rem 5%; }
+  .shop-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.8rem; }
+  .shop-head h2{ font-size:1.7rem; font-weight:800; }
+  .shop-head a{ color:var(--accent); font-size:0.88rem; font-weight:600; }
+
+  .grid{
+    display:grid; grid-template-columns:repeat(4, 1fr);
+    gap:0.8rem;
+  }
+  .card{
+    background:var(--charcoal); border:1px solid rgba(154,163,178,0.12);
+    border-radius:10px; padding:0.7rem; position:relative;
+    transition:transform 0.25s ease, border-color 0.25s ease;
+  }
+  .card:hover{ transform:translateY(-4px); border-color:var(--accent); }
+  .badge{
+    position:absolute; top:0.5rem; left:0.5rem; background:var(--gold); color:var(--navy);
+    font-size:0.55rem; font-weight:800; padding:0.15rem 0.4rem; border-radius:4px; letter-spacing:0.02em;
+  }
+  .card-visual{
+    aspect-ratio:1/1; background:var(--slate); border-radius:8px; margin-bottom:0.6rem;
+    display:flex; align-items:center; justify-content:center; color:rgba(237,239,243,0.12);
+    font-weight:800; font-size:0.6rem; letter-spacing:0.03em;
+  }
+  .card h3{ font-size:0.78rem; margin-bottom:0.2rem; line-height:1.2; }
+  .card .desc{ color:var(--silver); font-size:0.62rem; margin-bottom:0.5rem; display:none; }
+  .price-row{ display:flex; align-items:baseline; gap:0.35rem; margin-bottom:0.5rem; flex-wrap:wrap; }
+  .price-now{ font-size:0.82rem; font-weight:800; color:var(--fog); }
+  .price-old{ font-size:0.62rem; color:var(--silver); text-decoration:line-through; }
+  .buy-btn{
+    display:block; width:100%; text-align:center; background:var(--accent); color:var(--fog);
+    padding:0.5rem 0.2rem; border-radius:6px; font-size:0.68rem; font-weight:700;
+    border:none; cursor:pointer; transition:background 0.2s ease;
+  }
+  .buy-btn:hover{ background:var(--gold); color:var(--navy); }
+
+  /* ABOUT */
+  .about{ padding:4rem 5%; background:var(--charcoal); text-align:center; }
+  .about h2{ font-size:1.8rem; font-weight:800; margin-bottom:1rem; }
+  .about p{ color:var(--silver); max-width:52ch; margin:0 auto; }
+
+  /* CONTACT / SOCIAL */
+  .contact{ padding:4rem 5%; text-align:center; }
+  .contact h2{ font-size:1.6rem; font-weight:800; margin-bottom:0.6rem; }
+  .contact p{ color:var(--silver); margin-bottom:1.6rem; }
+  .social-row{ display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; }
+  .social-row a{
+    padding:0.7rem 1.5rem; border:1px solid rgba(154,163,178,0.25); border-radius:6px;
+    color:var(--fog); font-size:0.85rem; font-weight:600; transition:border-color 0.2s ease, color 0.2s ease;
+  }
+  .social-row a:hover{ border-color:var(--gold); color:var(--gold); }
+
+  footer{ padding:2rem 5%; text-align:center; color:var(--silver); font-size:0.8rem; border-top:1px solid rgba(154,163,178,0.12); }
+
+  @media (max-width:800px){
+    .banner{ grid-template-columns:1fr; }
+    .banner-visual{ min-height:220px; }
+    nav ul{
+      position:fixed; top:0; right:-100%; height:100vh; width:70%;
+      background:var(--charcoal); flex-direction:column; padding:5rem 1.5rem;
+      transition:right 0.3s ease; gap:1.5rem; z-index:200;
+    }
+    nav ul.open{ right:0; }
+    .nav-toggle{ display:block; }
+    .shop-head{ flex-direction:column; align-items:flex-start; gap:0.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="promo-bar">
+  🎉 Free delivery across Pakistan &nbsp;·&nbsp; Sale ends in
+  <span class="timer" id="timer"><span id="hh">00</span>:<span id="mm">00</span>:<span id="ss">00</span></span>
+</div>
+
+<header>
+  <div class="logo">AHLAAT<span>.</span>PK</div>
+  <nav>
+    <ul id="navList">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#shop">Watches</a></li>
+      <li><a href="#shop">Bracelets</a></li>
+      <li><a href="#shop">Shoes</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+  <div style="display:flex; align-items:center; gap:1rem;">
+    <span class="cart-icon">🛒</span>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+  </div>
+</header>
+
+<section class="banner" id="home">
+  <div class="banner-text">
+    <div class="eyebrow">New Arrival</div>
+    <h1>Everyday essentials, done right</h1>
+    <p>Quality home and lifestyle picks, shipped fast across Pakistan — no markup games, just good stuff.</p>
+    <a href="#shop" class="btn-primary">Shop Now</a>
+  </div>
+  <div class="banner-visual">AHLAAT.PK</div>
+</section>
+
+<div class="perks">
+  <div>✔ <strong>Free Delivery</strong></div>
+  <div>✔ <strong>7 Day Replacement</strong></div>
+  <div>✔ <strong>Cash on Delivery</strong></div>
+  <div>✔ <strong>Trusted by 1,000+ Customers</strong></div>
+</div>
+
+<section class="shop-section" id="shop">
+  <div class="shop-head">
+    <h2>Best Sellers</h2>
+    <a href="#">View all →</a>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <div class="badge">SALE</div>
+      <div class="card-visual">ITEM 01</div>
+      <h3>Home Essential Set</h3>
+      <div class="desc">Considered pieces for everyday living.</div>
+      <div class="price-row">
+        <span class="price-now">Rs. 1,499</span>
+        <span class="price-old">Rs. 1,999</span>
+      </div>
+      <button class="buy-btn">Buy Now</button>
+    </div>
+    <div class="card">
+      <div class="card-visual">ITEM 02</div>
+      <h3>Everyday Wearable</h3>
+      <div class="desc">Simple accessories that fit any wardrobe.</div>
+      <div class="price-row">
+        <span class="price-now">Rs. 999</span>
+      </div>
+      <button class="buy-btn">Buy Now</button>
+    </div>
+    <div class="card">
+      <div class="badge">NEW</div>
+      <div class="card-visual">ITEM 03</div>
+      <h3>Gifting Set</h3>
+      <div class="desc">Thoughtful sets for people who have it all.</div>
+      <div class="price-row">
+        <span class="price-now">Rs. 2,199</span>
+      </div>
+      <button class="buy-btn">Buy Now</button>
+    </div>
+    <div class="card">
+      <div class="card-visual">ITEM 04</div>
+      <h3>Signature Piece</h3>
+      <div class="desc">Our most-loved item, restocked weekly.</div>
+      <div class="price-row">
+        <span class="price-now">Rs. 3,499</span>
+        <span class="price-old">Rs. 3,999</span>
+      </div>
+      <button class="buy-btn">Buy Now</button>
+    </div>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <h2>Built for the everyday, not the algorithm</h2>
+  <p>Ahlaat.Pk started as a small idea: that everyday things deserve the same care as special ones. Every order is packed and shipped with the same attention we'd want for ourselves.</p>
+</section>
+
+<section class="contact" id="contact">
+  <h2>Get in touch</h2>
+  <p>Questions about an order or a product? Reach us directly.</p>
+  <div class="social-row">
+    <a href="mailto:amanbutt7232@gmail.com">Email</a>
+    <a href="https://wa.me/923297232714" target="_blank" rel="noopener">WhatsApp</a>
+    <a href="https://instagram.com/ahlaat.pk" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://tiktok.com/@ahlaat.pk" target="_blank" rel="noopener">TikTok</a>
+  </div>
+</section>
+
+<footer>© 2026 Ahlaat.Pk. All rights reserved.</footer>
+
+<script>
+  // Mobile nav
+  const navToggle = document.getElementById('navToggle');
+  const navList = document.getElementById('navList');
+  navToggle.addEventListener('click', () => navList.classList.toggle('open'));
+  navList.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navList.classList.remove('open')));
+
+  // Countdown timer (resets every 24h for demo purposes)
+  function updateTimer(){
+    const now = new Date();
+    const end = new Date();
+    end.setHours(24,0,0,0);
+    let diff = Math.max(0, end - now);
+    const hh = String(Math.floor(diff / 3600000)).padStart(2,'0');
+    const mm = String(Math.floor((diff % 3600000) / 60000)).padStart(2,'0');
+    const ss = String(Math.floor((diff % 60000) / 1000)).padStart(2,'0');
+    document.getElementById('hh').textContent = hh;
+    document.getElementById('mm').textContent = mm;
+    document.getElementById('ss').textContent = ss;
+  }
+  updateTimer();
+  setInterval(updateTimer, 1000);
+</script>
+
+</body>
+</html>

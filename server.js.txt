@@ -1,0 +1,82 @@
+require('dotenv').config();
+const express = require('express');
+const nodemailer = require('nodemailer');
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Gmail transporter — uses an App Password, not your normal Gmail password.
+// See README.md for how to generate one.
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
+
+app.post('/api/order', async (req, res) => {
+  const { customer, items, total } = req.body;
+
+  if (!customer || !customer.email || !items || items.length === 0) {
+    return res.status(400).json({ error: 'Missing order details.' });
+  }
+
+  const itemsHtml = items
+    .map(
+      (i) =>
+        `<tr>
+          <td style="padding:6px 10px;border-bottom:1px solid #eee;">${i.name}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #eee;">${i.qty}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #eee;">$${(i.price * i.qty).toFixed(2)}</td>
+        </tr>`
+    )
+    .join('');
+
+  const orderHtml = `
+    <h2>New order received</h2>
+    <p><b>Customer:</b> ${customer.name} (${customer.email})</p>
+    <p><b>Phone:</b> ${customer.phone || 'N/A'}</p>
+    <p><b>Shipping address:</b> ${customer.address || 'N/A'}</p>
+    <table style="border-collapse:collapse;width:100%;max-width:480px;">
+      <tr style="background:#f4f4f4;">
+        <th style="padding:6px 10px;text-align:left;">Item</th>
+        <th style="padding:6px 10px;text-align:left;">Qty</th>
+        <th style="padding:6px 10px;text-align:left;">Subtotal</th>
+      </tr>
+      ${itemsHtml}
+    </table>
+    <p style="margin-top:12px;"><b>Total: $${total.toFixed(2)}</b></p>
+  `;
+
+  try {
+    // 1. Notify the store owner (you)
+    await transporter.sendMail({
+      from: `"Ahlaat.Pk Orders" <${process.env.GMAIL_USER}>`,
+      to: process.env.GMAIL_USER,
+      subject: `New order from ${customer.name} — $${total.toFixed(2)}`,
+      html: orderHtml,
+    });
+
+    // 2. Send a confirmation to the customer (optional but recommended)
+    await transporter.sendMail({
+      from: `"Ahlaat.Pk" <${process.env.GMAIL_USER}>`,
+      to: customer.email,
+      subject: 'Your order confirmation',
+      html: `<p>Thanks for your order, ${customer.name}!</p>${orderHtml}`,
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Email send failed:', err);
+    res.status(500).json({ error: 'Could not send order email.' });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Store running at http://localhost:${PORT}`);
+});
